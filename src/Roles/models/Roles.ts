@@ -4,7 +4,7 @@ const {Schema, model} = mongoose
 const types = Schema.Types
 const rolesSchema = new Schema({
     roleName: {type: types.String, unique:true, required: true},
-})
+},{collection: "Roles"})
 
-const rolesModel = model("Roles", rolesSchema)
-export default rolesModel
+const RolesModel = model("Roles", rolesSchema)
+export default RolesModel

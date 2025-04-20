@@ -1,2 +1,5 @@
 node_modules
 src/Users/resolvers
+src/Users/types
+src/test.ts
+src/**/**/*.js

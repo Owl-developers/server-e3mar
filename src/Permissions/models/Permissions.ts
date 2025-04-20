@@ -9,9 +9,14 @@ const permissionSchema = new Schema({
     type: String,
     required: true,
     unique: true
+  },
+  description: {
+    type: String,
+    required: true,
+    unique: true
   }
-});
+},{collection: "Permissions"});
 
-const Permission = model('Permission', permissionSchema);
+const Permission = model('Permissions', permissionSchema);
 
 export default Permission;
