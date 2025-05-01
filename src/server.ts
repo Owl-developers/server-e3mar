@@ -21,9 +21,10 @@ async function bootstrap() {
   
     const schema = await buildSchema({
       resolvers: [UserResolvers],
-      validate: false,
+      validate: true,
       emitSchemaFile: true,
-      });
+      globalMiddlewares: [errorValidationHandler],
+    });
 
 
 
