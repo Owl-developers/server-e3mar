@@ -5,18 +5,18 @@
 
 type Mutation {
   register(input: RegisterInput!): User!
+  register1: User!
 }
 
 type Query {
-  register(input: RegisterInput!): User
+  login(email: String!, password: String!, username: String!): User
 }
 
 input RegisterInput {
-  email: String
+  email: String!
   imageUrl: String
-  password: String
-  phone: String
-  role_id: String
+  password: String!
+  phone: String!
   username: String!
 }
 
@@ -24,8 +24,7 @@ type User {
   _id: ID!
   email: String
   imageUrl: String
-  password: String
+  isSuperAdmin: Boolean!
   phone: String
-  role_id: ID
   username: String!
 }

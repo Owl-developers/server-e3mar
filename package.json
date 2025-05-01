@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "nodemon src/server.ts",
-    "dev1": "nodemon src/test.js"
+    "dev2": "ts-node-dev --respawn src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,8 @@
   "dependencies": {
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.1",
+    "bcryptjs": "^3.0.2",
+    "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -31,8 +33,10 @@
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
-    "@types/jsonwebtoken": "^9.0.9"
+    "@types/jsonwebtoken": "^9.0.9",
+    "ts-node-dev": "^2.0.0"
   }
 }

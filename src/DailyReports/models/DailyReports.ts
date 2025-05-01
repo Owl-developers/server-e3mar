@@ -4,7 +4,6 @@ const {Schema, model} = mongoose
 const types = Schema.Types
 
 const dailyReportsSchema = new Schema({
-
     reporter_id: {
       type: types.ObjectId,
       ref: 'User',

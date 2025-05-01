@@ -17,6 +17,6 @@ const permissionSchema = new Schema({
   }
 },{collection: "Permissions"});
 
-const Permission = model('Permissions', permissionSchema);
+const PermissionsModel = model('Permissions', permissionSchema);
 
-export default Permission;
+export default PermissionsModel;

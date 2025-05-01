@@ -7,7 +7,10 @@ import { graphqlHTTP } from 'express-graphql';
 import { buildSchema } from 'type-graphql';
 import mongoose from "mongoose";
 import cookieParser from 'cookie-parser';
-import { UserRes } from './Users/resolvers/user.resolver';
+import { UserResolvers } from './Users/resolvers/user.resolver';
+import { ProjectsResolvers } from './Projects/resolvers/projects.resolver';
+import { errorValidationHandler } from "./helper/validationError";
+import { checkRoles } from "./helper";
 
 interface Context {
   req: Request
@@ -17,10 +20,10 @@ interface Context {
 async function bootstrap() {
   
     const schema = await buildSchema({
-      resolvers: [UserRes],
+      resolvers: [UserResolvers],
       validate: false,
       emitSchemaFile: true,
-    });
+      });
 
 
 
@@ -51,7 +54,8 @@ async function bootstrap() {
       schema ,
       context:{req, res},
       graphiql: true, // Enable GraphiQL for in-browser testing
-
+      // customExecuteFn: errorValidationHandler
+      // customFormatErrorFn:errorValidationHandler
     }
 
   }));

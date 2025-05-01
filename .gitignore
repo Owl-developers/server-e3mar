@@ -1,5 +1,10 @@
 node_modules
 src/Users/resolvers
 src/Users/types
+src/Users/middleware
 src/test.ts
 src/**/**/*.js
+src/helper
+src/Projects/middleware
+src/Projects/resolvers
+src/Projects/types
