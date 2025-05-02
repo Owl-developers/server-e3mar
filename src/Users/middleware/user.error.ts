@@ -1,18 +1,16 @@
 // import { GraphQLError } from "graphql";
 import { GraphQLError } from "graphql/error";
 import { Error } from "mongoose";
-import { MiddlewareFn, UseMiddleware } from "type-graphql";
+import { MiddlewareFn } from "type-graphql";
 import { Context } from "../types/user.types";
 import { languageError, throwGraphqlError } from "../../helper";
-import { ValidationError,ValidatorConstraintInterface } from "class-validator";
+import { ValidationError } from "class-validator";
 
 
 export const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, next)=> {
     try {
         console.log(args)
-        if(args.username == "ebrahim allawi") {
-            return throwGraphqlError('try another name',59091, languageError('try another name',"جرب اسم مستخدم ااخر"))
-        }
+
         console.log( new Date().getUTCMilliseconds() )
         await next()
         console.log( new Date().getUTCMilliseconds() )

@@ -14,9 +14,10 @@ export const errorValidationHandler: MiddlewareFn<Context> = async ({info}, next
         console.log("errorValidationHandler:")
         console.log("err:",err)
         if(Object.keys(err).includes('validationErrors')) {
-            console.log('validationErrors')
+            console.log('===validationErrors')
             Validation.setError = err
             var a = Validation.translateValidationErrors()
+            console.log(a)
             console.log(Object.keys(err))
             return throwGraphqlError('error validation',400, languageError(a.en, a.ar))
         }
@@ -36,6 +37,11 @@ class Validation {
             password: {en: "password", ar: "كلمة السر"},
             phone: {en: "phone", ar: "رقم الهاتف"},
             email: {en: "email", ar: "البريد الالكتروني"},
+            projectName: {en: "project name", ar: "اسم المشروع"},
+            description: {en: "description", ar: "الوصف"},
+            progress: {en: "progress", ar: "التقدم"},
+            imageUrl: {en: "imageUrl", ar: "عنوان الصورة"},
+            projectManager: {en: "project manager", ar: "اسم مدير المشروع"},
         }
         var property = this.property
         var constraint = this.constraint

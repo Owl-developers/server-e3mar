@@ -3,9 +3,30 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input CreateProjectArgs {
+  description: String
+  imageUrl: String
+  progress: Float
+  projectManager: String!
+  projectName: String!
+}
+
 type Mutation {
+  createProject(input: CreateProjectArgs!): Project!
   register(input: RegisterInput!): User!
-  register1: User!
+}
+
+type Project {
+  _id: ID!
+  createdBy_id: userId!
+  description: String
+  engineers_id: [userId!]
+  imageUrl: String
+  owner_id: userId
+  progress: Float
+  projectManager_id: userId
+  projectName: String!
+  workers_id: [userId!]
 }
 
 type Query {
@@ -27,4 +48,9 @@ type User {
   isSuperAdmin: Boolean!
   phone: String
   username: String!
+}
+
+type userId {
+  _id: ID
+  username: String
 }

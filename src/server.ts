@@ -20,7 +20,7 @@ interface Context {
 async function bootstrap() {
   
     const schema = await buildSchema({
-      resolvers: [UserResolvers],
+      resolvers: [UserResolvers, ProjectsResolvers],
       validate: true,
       emitSchemaFile: true,
       globalMiddlewares: [errorValidationHandler],
