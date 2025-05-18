@@ -10,11 +10,6 @@ export const ProjectsSchema = new Schema<Project>({
     description: {type: types.String, unique:false, required: false, default: ""},
     progress: {type: types.Number, unique:false, required: false, default: 0},
     imageUrl: {type: types.String, unique:false, required: false, default: ""},
-    createdBy_id: {type: types.ObjectId, unique:false,required: true, ref: "Users", index: true},
-    projectManager_id: {type: types.ObjectId, unique:false,required: true, ref:"Users", index: true},
-    engineers_id: [{type: types.ObjectId, unique:false,required: false, ref:"Users", index: true}],
-    workers_id: [{type: types.ObjectId, unique:false,required: false, ref:"Users", index: true}],
-    owner_id: {type: types.ObjectId, unique:false,required: false, ref:"Users", index: true},
 }, {collection: "Projects", timestamps: true})
 const ProjectsModel = model("Projects", ProjectsSchema)
 export default ProjectsModel
