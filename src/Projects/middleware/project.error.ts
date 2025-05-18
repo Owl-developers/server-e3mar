@@ -15,6 +15,16 @@ const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, next)=> {
         if(err.code == "404" && err.message == "user not found") {
             return throwGraphqlError("user not found",404, languageError("user not found", "المستخدم غير موجود"))
         }
+        if(err.code == "404" && err.message == "project not found") {
+            return throwGraphqlError("project not found",404, languageError("project not found", "المشروع غير موجود"))
+        }
+        if(err.code == "404" && err.message == "no projects found") {
+            return throwGraphqlError("no projects found",404, languageError("no projects found", "لا يوجد مشاريع"))
+        }
+        if(err.code == "400" && err.message == "user already in the project") {
+            return throwGraphqlError("user already in the project",400, languageError("user already in the project", "المستخدم موجود بالفعل في هذا المشروع"))
+        }
+
         // if(err.code == "404") {
         //     return throwGraphqlError("project not found",404, languageError("project not found", "المشروع غير موجود"))
         // }

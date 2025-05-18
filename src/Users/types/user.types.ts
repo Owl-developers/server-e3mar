@@ -21,7 +21,13 @@ export class User {
 }
 
 @ArgsType()
-export class LoginArgs {
+export class Testt {
+    @Field()
+    tt: string
+}
+
+@InputType()
+export class LoginInput {
     @Field(()=>String)
     @Length(3,15)
     username!: string

@@ -1,12 +1,18 @@
-import {Resolver, Query, ObjectType, Field, Arg, InputType, ArgsType, Args,ArgOptions, ID, Int, Mutation, Ctx, Authorized, UseMiddleware } from "type-graphql"
-import {User,Context, RegisterInput, LoginArgs} from '../types/user.types'
+import {
+  Resolver, Query, ObjectType, Field, Arg, 
+  InputType, ArgsType, Args,ArgOptions, ID, Int, 
+  Mutation, Ctx, Authorized, UseMiddleware,
+  PubSub, PubSubEngine
+} from "type-graphql"
+import {User,Context, RegisterInput, LoginInput, Testt} from '../types/user.types'
 import UserModel from '../models/Users'
 import RolesModel from '../../Roles/models/Roles'
 import RolesPermissions from "../../RolesPermissions/models/RolesPermissions"
 import PermissionsModel from "../../Permissions/models/Permissions"
 import { errorHandler } from "../middleware/user.error"
 import { GraphQLError } from "graphql"
-import { generateToken, throwKnownError } from "../../helper"
+import { generateToken, throwResolverError, verifyToken } from "../../helper"
+import { authMiddelware } from "../../helper/auth"
 import bcrypt from "bcryptjs"
 
 async function test() {
@@ -714,25 +720,53 @@ const users = [
         isSuperAdmin: false
       }
 ];
-  
 
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 // @UseMiddleware(errorHandler)
-@Resolver(User)
+// @Resolver(User)
 export class UserResolvers {
+    // @Query(()=> String)
+    // test():string {
+    //   return 'a'
+    // }
+    @Query(()=> User)
+    @UseMiddleware(authMiddelware, errorHandler)
+    async auth(@Ctx() {req, res}: Context): Promise<User | null> {
+      console.log("auth resolvers")
+      const token = res.locals.token
+      console.log("token", token)
+      if(!token) {
+        throw throwResolverError(401, "unauthenticated")
+      }
+      const user = await UserModel.findById(token._id)
+      if(!user) {
+        throw throwResolverError(401, "unauthenticated")
+      }
+
+      return user
+
+    }
+
+    @Mutation(() => User, {nullable: true})
     @UseMiddleware(errorHandler)
-    @Query((returns) => User, {nullable: true})
-    async login(@Ctx() {req, res}: Context, @Args() {username,password, email}: LoginArgs):Promise<User | null> {
+    async login(
+      @Ctx() {req, res}: Context,
+       @Arg("input") input: LoginInput,
+      ):Promise<User | null> {
+        // await wait(5000)
+        const {username, password, email} = input
         console.log("login user resolvers")
         const user = await UserModel.findOne({username, email})
         
-        console.log()
         if(!user) {
-            throw throwKnownError(404, 'user not found')
+            throw throwResolverError(404, 'user not found')
         }
         const correctPassword = await bcrypt.compare(password, user.password)
         console.log(correctPassword)
         if(!correctPassword) {
-            throw throwKnownError(404, 'user not found')
+            throw throwResolverError(404, 'user not found')
         }
         console.log(user)
         console.log()
@@ -756,6 +790,15 @@ export class UserResolvers {
         const token = generateToken(user)
         res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
         return user
+    }
+    @Mutation(()=> User)
+    async test():Promise<User | null> {
+        console.log("test resolvers")
+
+        const user = await UserModel.deleteMany({email: {$regex: "@example.com"}})
+        console.log(user)
+
+        return null
     }
 
 }

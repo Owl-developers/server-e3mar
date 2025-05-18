@@ -5,19 +5,33 @@
 
 input CreateProjectArgs {
   description: String
-  imageUrl: String
   progress: Float
   projectManager: String!
   projectName: String!
 }
 
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
 type Mutation {
+  _test: String!
   createProject(input: CreateProjectArgs!): Project!
+  login(input: LoginInput!): User
   register(input: RegisterInput!): User!
+  test: User!
 }
 
 type Project {
   _id: ID!
+  createdAt: DateTime
   createdBy_id: userId!
   description: String
   engineers_id: [userId!]
@@ -26,11 +40,12 @@ type Project {
   progress: Float
   projectManager_id: userId
   projectName: String!
+  updatedAt: DateTime
   workers_id: [userId!]
 }
 
 type Query {
-  login(email: String!, password: String!, username: String!): User
+  auth: User!
 }
 
 input RegisterInput {

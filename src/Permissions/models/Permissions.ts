@@ -14,8 +14,15 @@ const permissionSchema = new Schema({
     type: String,
     required: true,
     unique: true
+  },
+  tag: {
+    type: String,
+    required: true,
+    index: true
   }
-},{collection: "Permissions"});
+
+
+},{collection: "Permissions", strict: false});
 
 const PermissionsModel = model('Permissions', permissionSchema);
 

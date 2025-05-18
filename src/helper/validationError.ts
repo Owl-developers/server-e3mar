@@ -1,6 +1,6 @@
 import { MiddlewareFn } from "type-graphql"
 import { Context } from "../Users/types/user.types"
-import { languageError, throwGraphqlError } from "."
+import { languageError, throwGraphqlError, throwValidationError } from "."
 import { ValidationError } from "class-validator"
 import { GraphQLError } from "graphql"
 
@@ -16,10 +16,11 @@ export const errorValidationHandler: MiddlewareFn<Context> = async ({info}, next
         if(Object.keys(err).includes('validationErrors')) {
             console.log('===validationErrors')
             Validation.setError = err
-            var a = Validation.translateValidationErrors()
-            console.log(a)
+            var {en, ar} = Validation.translateValidationErrors()
+            console.log(en, ar)
+            console.log("property",Validation.property)
             console.log(Object.keys(err))
-            return throwGraphqlError('error validation',400, languageError(a.en, a.ar))
+            return throwValidationError('error validation',400, Validation.property, languageError(en, ar))
         }
         return throwGraphqlError('error from our server',500, languageError('error from our server',"خطأ من السيرفر الخاص بنا"))
     }
@@ -27,11 +28,11 @@ export const errorValidationHandler: MiddlewareFn<Context> = async ({info}, next
 
 class Validation {
     private static err: ValidationError[]
-    private static property:string
+    static property:string
     private static constraint:string
     // property = this.err[0].property
     // constraint = Object.keys(err[0].constraints)[0]
-    static translateValidationErrors():Record<string, any> {
+    static translateValidationErrors():{en:string, ar:string} {
         var path = {
             username: {en: "username", ar: "اسم المستخدم"},
             password: {en: "password", ar: "كلمة السر"},

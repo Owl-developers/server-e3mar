@@ -10,7 +10,6 @@ import { ValidationError } from "class-validator";
 export const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, next)=> {
     try {
         console.log(args)
-
         console.log( new Date().getUTCMilliseconds() )
         await next()
         console.log( new Date().getUTCMilliseconds() )
@@ -30,6 +29,9 @@ export const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, nex
         }
         if(err.code == 404) {
             return throwGraphqlError("can't find user",404, languageError('user name or password incorrect','اسم المستخدم او كلمة السر غير صحيحة'))
+        }
+        if(err.code == 401) {
+            return throwGraphqlError("unauthenticated",401, languageError('unauthenticated','غير مسجل'))
         }
         throw err        
     }

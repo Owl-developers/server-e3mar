@@ -33,6 +33,10 @@ class Project {
     workers_id?: Array<userId>
     @Field(()=> userId,{nullable: true})
     owner_id?: userId
+    @Field(()=> Date,{nullable: true})
+    createdAt?: Date
+    @Field(()=> Date,{nullable: true})
+    updatedAt?: Date
 }
 
 @InputType()
@@ -47,8 +51,6 @@ class CreateProjectArgs {
     @Min(0)
     @Max(100)
     progress?: number
-    @Field(()=> String, {nullable: true})
-    imageUrl?: string
     @Field(()=> String)
     @Length(3,15)
     projectManager?: string
@@ -57,5 +59,5 @@ class CreateProjectArgs {
 
 export {
     Project,
-    CreateProjectArgs
+    CreateProjectArgs, 
 }

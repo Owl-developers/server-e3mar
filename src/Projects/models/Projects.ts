@@ -15,8 +15,7 @@ export const ProjectsSchema = new Schema<Project>({
     engineers_id: [{type: types.ObjectId, unique:false,required: false, ref:"Users", index: true}],
     workers_id: [{type: types.ObjectId, unique:false,required: false, ref:"Users", index: true}],
     owner_id: {type: types.ObjectId, unique:false,required: false, ref:"Users", index: true},
-
-}, {collection: "Projects"})
+}, {collection: "Projects", timestamps: true})
 const ProjectsModel = model("Projects", ProjectsSchema)
 export default ProjectsModel
 
