@@ -4,14 +4,12 @@ const {Schema, model} = mongoose
 const types = Schema.Types
 
 const rolesPermissionsSchema = new Schema({
-    role_id: [{
-      type: types.ObjectId,
-      ref: 'Roles', // Reference to Role model
+    roleName: {
+      type: types.String,
       required: true
-    }],
-    permission_id: {
-      type: types.ObjectId,
-      ref: 'Permissions', // Reference to Permission model
+    },
+    permissionName: {
+      type: types.String,
       required: true
     },
     description: {

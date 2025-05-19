@@ -6,45 +6,14 @@ import {
 } from "type-graphql"
 import {User,Context, RegisterInput, LoginInput, Testt} from '../types/user.types'
 import UserModel from '../models/Users'
-import RolesModel from '../../Roles/models/Roles'
 import RolesPermissions from "../../RolesPermissions/models/RolesPermissions"
-import PermissionsModel from "../../Permissions/models/Permissions"
 import { errorHandler } from "../middleware/user.error"
 import { GraphQLError } from "graphql"
 import { generateToken, throwResolverError, verifyToken } from "../../helper"
 import { authMiddelware } from "../../helper/auth"
 import bcrypt from "bcryptjs"
 
-async function test() {
-    // const manager = await RolesModel.findOne({roleName: "manager"})
 
-
-    // const
-    // console.log(p)
-    // await PermissionsModel.insertMany(permissions)
-    // await RolesModel.insertOne(
-    //     {roleName: 'worker'}, 
-
-    // )
-    // const user = await UserModel.insertOne({
-    //     username: "awd",
-    //     password: "awd",
-    //     email: "awd",
-    //     phone: "awd",
-    //     role_id: manager._id,
-    // })
-    try {
-        // const user = await UserModel.findOne({username: "awd"}).populate({path: "role_id"})
-        // const rolesPermissions = await RolesPermissions.find().populate({path: "permission_id"})
-        // const user = await UserModel.findOne({username: "awd2"}).getPopulatedPaths()
-        // console.log(user)
-        // console.log(rolesPermissions)
-        
-    } catch (err) {
-        console.log("err", err)
-    }
-    console.log('111')
-}
 const users = [
     {
       username: "john_doe",
@@ -724,13 +693,9 @@ const users = [
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-// @UseMiddleware(errorHandler)
-// @Resolver(User)
+
 export class UserResolvers {
-    // @Query(()=> String)
-    // test():string {
-    //   return 'a'
-    // }
+
     @Query(()=> User)
     @UseMiddleware(authMiddelware, errorHandler)
     async auth(@Ctx() {req, res}: Context): Promise<User | null> {

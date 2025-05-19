@@ -6,7 +6,6 @@
 input CreateProjectArgs {
   description: String
   progress: Float
-  projectManager: String!
   projectName: String!
 }
 
@@ -32,16 +31,11 @@ type Mutation {
 type Project {
   _id: ID!
   createdAt: DateTime
-  createdBy_id: userId!
   description: String
-  engineers_id: [userId!]
   imageUrl: String
-  owner_id: userId
   progress: Float
-  projectManager_id: userId
   projectName: String!
   updatedAt: DateTime
-  workers_id: [userId!]
 }
 
 type Query {
@@ -63,9 +57,4 @@ type User {
   isSuperAdmin: Boolean!
   phone: String
   username: String!
-}
-
-type userId {
-  _id: ID
-  username: String
 }
