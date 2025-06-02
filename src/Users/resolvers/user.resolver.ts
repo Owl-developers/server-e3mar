@@ -2,7 +2,9 @@ import {
   Resolver, Query, ObjectType, Field, Arg, 
   InputType, ArgsType, Args,ArgOptions, ID, Int, 
   Mutation, Ctx, Authorized, UseMiddleware,
-  PubSub, PubSubEngine
+  PubSub,
+
+  ResolverData
 } from "type-graphql"
 import {User,Context, RegisterInput, LoginInput, Testt} from '../types/user.types'
 import UserModel from '../models/Users'
@@ -12,6 +14,7 @@ import { GraphQLError } from "graphql"
 import { generateToken, throwResolverError, verifyToken } from "../../helper"
 import { authMiddelware } from "../../helper/auth"
 import bcrypt from "bcryptjs"
+import { errorValidationHandler } from "../../helper/validationError"
 
 
 const users = [
@@ -694,8 +697,13 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// @UseMiddleware(errorValidationHandler)
+@Resolver()
 export class UserResolvers {
-
+    // @Query(()=> String)
+    // test():string {
+    //   return 'a'
+    // }
     @Query(()=> User)
     @UseMiddleware(authMiddelware, errorHandler)
     async auth(@Ctx() {req, res}: Context): Promise<User | null> {
@@ -717,8 +725,9 @@ export class UserResolvers {
     @Mutation(() => User, {nullable: true})
     @UseMiddleware(errorHandler)
     async login(
-      @Ctx() {req, res}: Context,
-       @Arg("input") input: LoginInput,
+        @Ctx() {req, res}: Context,
+        @Arg("input") input: LoginInput,
+
       ):Promise<User | null> {
         // await wait(5000)
         const {username, password, email} = input
@@ -738,6 +747,8 @@ export class UserResolvers {
         console.log(req.cookies)
         const token = generateToken(user)
         res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
+        // Subscribe to PROJECT_CREATED events
+        // pubsub.publish("testPUB","test")
         return user
     }
     @Mutation(()=> User)
@@ -762,8 +773,9 @@ export class UserResolvers {
 
         const user = await UserModel.deleteMany({email: {$regex: "@example.com"}})
         console.log(user)
-
+        
         return null
     }
+
 
 }

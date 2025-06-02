@@ -2,7 +2,6 @@ import {
     Authorized, Ctx, Mutation, Resolver, 
     UseMiddleware, Arg, Subscription, Root,
     PubSub,
-    PubSubEngine,
     Args,
 } from "type-graphql"
 
@@ -31,7 +30,7 @@ class ProjectsResolvers {
         @Ctx() { req, res }: Context,
         @Arg("input") input: CreateProjectArgs,
     ): Promise<Project | string> {
-        console.log("projects.resolver")
+        console.log("createProject projects.resolver")
         try {
             const {projectName, description, progress} = input
             const token = res.locals.token
@@ -44,7 +43,7 @@ class ProjectsResolvers {
                 description,
                 progress,
             })
-            
+
             const transformedProject: Project = {
                 _id: project._id,
                 projectName: project.projectName,

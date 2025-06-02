@@ -2,6 +2,8 @@ import { MiddlewareFn } from "type-graphql";
 import { Context } from "../../Users/types/user.types";
 import { languageError, throwGraphqlError } from "../../helper";
 
+
+
 const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, next)=> {
     try {
         await next()
@@ -23,6 +25,9 @@ const errorHandler: MiddlewareFn<Context> = async ({info, root,args}, next)=> {
         }
         if(err.code == "400" && err.message == "user already in the project") {
             return throwGraphqlError("user already in the project",400, languageError("user already in the project", "المستخدم موجود بالفعل في هذا المشروع"))
+        }
+        if(err.code == "500" && err.message) {
+            return throwGraphqlError(err.message,500, languageError('error from our server', "خطأ في الخادم"))   
         }
 
         // if(err.code == "404") {

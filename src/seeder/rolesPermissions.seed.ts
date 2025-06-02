@@ -1,10 +1,11 @@
 import RolesPermissionsSchema from '../RolesPermissions/models/RolesPermissions'
 
-import {permissions,roles, rolesPermissoins} from '../types/roles.types'
+import {permissions,roles, rolesPermissions} from '../types/roles.types'
 
 export const seedRolesPermissions = async () => {
+    // await RolesPermissionsSchema.createIndexes()
     await RolesPermissionsSchema.deleteMany({});
-    for (const [roleName, permissions] of Object.entries(rolesPermissoins)) {
+    for (const [roleName, permissions] of Object.entries(rolesPermissions)) {
         for (const permissionName of permissions) {
             const description = `${roleName} => ${permissionName}`;
             await RolesPermissionsSchema.create({

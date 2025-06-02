@@ -1,32 +1,34 @@
-import { Schema, model } from "mongoose";
-interface MemberDocument extends Document {
-    username: Schema.Types.ObjectId;
-    email: string;
-    phone: string;
-    role: 'manager' | 'engineer' | 'worker' | 'owner';
-    projects: Schema.Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import { Schema, model, Document as MongooseDocument } from "mongoose"; // Added MongooseDocument
 
-const MemberSchema = new Schema<MemberDocument>({
-    username: {
+
+const MemberSchema = new Schema({
+    _userId: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'Users',
-        unique: true
+        index: {
+            _userId: 1,
+            unique: true
+        }
     },
-
+    _projectId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Projects',
+        index: {
+            _projectId: 1,
+            unique: true
+        }
+    },
     role: {
         type: String,
-        enum: ['manager', 'engineer', "worker",'worker'],
+        enum: ['manager', 'engineer','worker', 'owner'],
         required: true
     },
-    projects: {
-        type: Schema.Types.ObjectId,
-        ref: 'Projects'
-    }
-}, {collection: "Members", timestamps: true });
+}, {
+    collection: "Members",
+    timestamps: true,
+});
 
 const MemberModel = model('Members', MemberSchema);
 

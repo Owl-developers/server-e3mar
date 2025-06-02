@@ -5,7 +5,7 @@ const types = Schema.Types
 
 
 
-export const ProjectsSchema = new Schema<Project>({
+export const ProjectsSchema = new Schema({
     projectName: {type: types.String, unique:true, required: true, index: true},
     description: {type: types.String, unique:false, required: false, default: ""},
     progress: {type: types.Number, unique:false, required: false, default: 0},

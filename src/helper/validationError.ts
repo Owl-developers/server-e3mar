@@ -7,15 +7,16 @@ import { GraphQLError } from "graphql"
 export const errorValidationHandler: MiddlewareFn<Context> = async ({info}, next)=> {
     
     try {
-        const {fieldName} = info
+        const {fieldName,path} = info
         await next()
-        console.log("after1")
+        console.log("after1", fieldName, path)
     } catch (err) {
-        console.log("errorValidationHandler:")
-        console.log("err:",err)
-        if(Object.keys(err).includes('validationErrors')) {
+        console.log("errorValidationHandler: ts", err)
+
+        console.log("err:",err.extensions.validationErrors)
+        if(Object.keys(err.extensions).includes('validationErrors')) {
             console.log('===validationErrors')
-            Validation.setError = err
+            Validation.setError = err.extensions
             var {en, ar} = Validation.translateValidationErrors()
             console.log(en, ar)
             console.log("property",Validation.property)
@@ -66,6 +67,21 @@ class Validation {
                 ar: `${path[property].ar} ليس رقم صالح`,
             }
         }
+        if(constraint == "max") {
+            return {
+                // get the max number from the constraint
+
+                en: `${path[property].en} is greater than ${this.err[0].constraints.max}`,
+                ar: `${path[property].ar} اكبر من ${this.err[0].constraints.max}`,
+            }
+        }
+        if(constraint == "min") {
+            return {
+                // get the min number from the constraint
+                en: `${path[property].en} is less than ${this.err[0].constraints.min}`,
+                ar: `${path[property].ar} اقل من ${this.err[0].constraints.min}`,
+            }
+        }
         // console.log("constraint", this.constraint)
         return {
             en: "incorrect input",
@@ -75,8 +91,10 @@ class Validation {
 
     static set setError(_err: any) {
         this.err = _err.validationErrors
+        console.log("__err", this.err)
         this.property = this.err[0].property
         this.constraint = Object.keys(this.err[0].constraints)[0]
 
     }
+
 }

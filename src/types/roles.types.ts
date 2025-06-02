@@ -1,4 +1,4 @@
-import rolesPermissionsSchema from '../RolesPermissions/models/RolesPermissions'
+// import rolesPermissionsSchema from '../RolesPermissions/models/RolesPermissions'
 
 const roles = {
     superAdmin: 'super admin',
@@ -9,70 +9,71 @@ const roles = {
 }
 
 const permissions= {
+    // projects
+    viewAllProjects: "view all projects",
     CreateProject: "create project",
-    ViewProjects: "view project/s",
     EditProject: "edit project",
     DeleteProject: "delete project",
+    // daily report
+    viewAllDailyReports: "view all daily reports",
     CreateDailyReport: "create daily report",
-    ViewDailyReports: "view daily report/s",
     EditDailyReport: "edit daily report",
     DeleteDailyReport: "delete daily report",
+    // tasks
+    viewAllTasks: "view all tasks",
     CreateTask: "create task",
-    ViewTasks: "view task/s",
+    ViewTasks: "view tasks",
+    ViewTask: "view task",
     EditTask: "edit task",
     DeleteTask: "delete task",
+    // assign
     AssignUser: "assign user",
     UnassignUser: "unassign user",
 
 }
-const rolesPermissoins = {
+
+const rolesPermissions = {
     superAdmin: [
+        // project
+        "view all projects",
         "create project",
-        "view project",
-        "edit project", 
+        "edit project",
         "delete project",
-        "view daily report/s",
-        "view task/s",
+        // daily report
+        "view all daily reports",
+        // tasks
+        "view all tasks",
+        // assign
         "assign user",
         "unassign user"
     ],
     manager: [
-        "view project",
+        // project
         "edit project",
         "delete project",
         "create daily report",
-        "view daily report/s",
+        // daily report
         "edit daily report",
         "delete daily report",
+        // tasks
         "create task",
-        "view task/s",
         "edit task",
         "delete task",
+        // assign user
         "assign user",
-        "unassign user"
+        "UnassignUser"
     ],
     engineer: [
-        "view project",
+
         "create daily report",
-        "view daily report/s",
         "edit daily report",
         "delete daily report",
+
         "create task",
-        "view task/s",
         "edit task",
-        "delete task"
+        "delete task",
     ],
-    worker: [
-        "view project",
-        "view daily report/s",
-        "view task/s"
-    ],
-    owner: [
-        "view project",
-        "view daily report/s",
-        "view task/s"
-    ]
 }
 
 
-export {roles, permissions, rolesPermissoins}
+export {roles, permissions, rolesPermissions}

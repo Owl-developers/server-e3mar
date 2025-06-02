@@ -6,17 +6,20 @@ const types = Schema.Types
 const rolesPermissionsSchema = new Schema({
     roleName: {
       type: types.String,
-      required: true
+      required: true,
+      index:true
     },
     permissionName: {
       type: types.String,
-      required: true
+      required: true,
+      index:true
+
     },
     description: {
       type: types.String,
       required: true
     }
-  }, {collection: "RolesPermissions"});
-  
+}, {collection: "RolesPermissions"});
+
 const RolesPermissions = model('RolesPermissions', rolesPermissionsSchema);
 export default RolesPermissions;

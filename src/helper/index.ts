@@ -6,6 +6,8 @@ import userModel from "../Users/models/Users";
 import { Project } from "../Projects/types/project.types";
 import ProjectsModel from "../Projects/models/Projects";
 import rolesPermissionsModel from "../RolesPermissions/models/RolesPermissions";
+import MemberModel from "../Member/model/Members.model";
+
 
 function generateToken(user: User): string {
     var token = jwt.sign({ _id: user._id}, "awd", { expiresIn: '1h' });
@@ -23,18 +25,22 @@ function languageError(en:string, ar:string): Record<string, any> {
 }
 
 type permission =
+
+"view all projects" |
 "create project" | 
-"view project/s" |
 "edit project" |
 "delete project" |
-"view daily report" |
+
+"view all daily reports" |
 "create daily report" |
 "edit daily report" |
 "delete daily report" |
+
+"view all tasks" |
 "create task" |
-"view task/s" |
 "edit task" |
 "delete task" |
+
 "assign user" |
 "unassign user"
 
@@ -45,43 +51,37 @@ function checkPermission(permissionName: permission):MiddlewareFn<Context> {
     return async ({context,args}, next)=> {
         console.log("check permission")
         const {req, res} = context
-        if(permissionName == 'create project') {
-            const user = await userModel.findById(res.locals.token._id)
-            if(user.isSuperAdmin) {
-                await next()
-                return
+        // if(permissionName == 'create project') {
+        //     const user = await userModel.findById(res.locals.token._id)
+        //     if(user.isSuperAdmin) {
+        //         await next()
+        //         return
+        //     }
+        //     return throwGraphqlError("forbiden", 403, languageError("you don't have permission", "لا تملك صلاحية"))
+        // }
+        let role: string
+        const user = await userModel.findById(res.locals.token._id)
+        if(user.isSuperAdmin) {
+            role = "superAdmin"
+        }
+        else {
+            const member = await MemberModel.findOne({_userId: res.locals.token._id}).select('role')
+            if(!member) {
+                return throwGraphqlError("forbiden", 403, languageError("you don't have permission", "لا تملك صلاحية"))
             }
+            role = member.role
+        }
+        // const user = await userModel.findById(res.locals.token._id)
+        const rolesPermissions = await rolesPermissionsModel.findOne({permissionName, roleName: role})
+        if(!rolesPermissions) {
             return throwGraphqlError("forbiden", 403, languageError("you don't have permission", "لا تملك صلاحية"))
         }
-        // console.log("args", args.input.projectName)
-        // const userInProject = await ProjectsModel.findOne({ $or: [
-        //     {engineers_id: {$in: [res.locals.token._id]}},
-        //     {workers_id: {$in: [res.locals.token._id]}},
-        //     {owner_id: res.locals.token._id},
-        //     {projectManager_id: res.locals.token._id},
-        //     {createdBy_id: res.locals.token._id}
-        // ]}) 
-        // .populate("owner_id")
-        // .populate("createdBy_id")
-        // .populate("projectManager_id")
-        // if(!userInProject) {
-        //     return throwGraphqlError("you are not in this project", 404, languageError("you are not in this project", "أنت لست في هذا المشروع"))
-        // }
-        // console.log(res.locals.token)
-        // console.log({project: userInProject})
-        // const roleName = roleUserInProject(userInProject, res.locals.token._id)
-        // console.log({roleName})
-        // const permission = await PermissionsModel.findOne({permissionName})
-        // const role = await RolesModel.findOne({roleName})
-        // const rolesPermissions = await rolesPermissionsModel.findOne({role_id: role._id, permission_id: permission._id})
-        // if(!rolesPermissions) {
-        //     return throwGraphqlError("you don't have permission", 403, languageError("you don't have permission", "ليس لديك صلاحية"))
-        // }
-
+        
         await next()
         console.log("check permission")
     }
 }
+
 function throwGraphqlError(message: string, code:number, _message: Record<string, any>): GraphQLError {
     return new GraphQLError(message, null, null, null, null,null, {code, message: _message})
 
