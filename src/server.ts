@@ -23,6 +23,8 @@ async function bootstrap() {
     resolvers: [UserResolvers,ProjectsResolvers],
     validate: true,
     emitSchemaFile: true,
+    // pubSub
+    // globalMiddlewares: [errorValidationHandler],
   });
 
 

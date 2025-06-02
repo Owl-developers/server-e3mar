@@ -727,6 +727,7 @@ export class UserResolvers {
     async login(
         @Ctx() {req, res}: Context,
         @Arg("input") input: LoginInput,
+        // @PubSub() pubsub: any, // This line is causing the error
       ):Promise<User | null> {
         // await wait(5000)
         const {username, password, email} = input

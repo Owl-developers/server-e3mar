@@ -3,6 +3,12 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input AddMemberToProjectInput {
+  projectName: String!
+  role: String!
+  username: String!
+}
+
 input CreateProjectArgs {
   description: String
   progress: Float
@@ -22,6 +28,7 @@ input LoginInput {
 
 type Mutation {
   _test: String!
+  addMemberToProject(input: AddMemberToProjectInput!): Project!
   createProject(input: CreateProjectArgs!): Project!
   login(input: LoginInput!): User
   register(input: RegisterInput!): User!
@@ -50,6 +57,10 @@ input RegisterInput {
   password: String!
   phone: String!
   username: String!
+}
+
+type Subscription {
+  test: String!
 }
 
 type User {

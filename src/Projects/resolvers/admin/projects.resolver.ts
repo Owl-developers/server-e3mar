@@ -114,7 +114,71 @@ class ProjectsResolvers {
         return project
     }
 
+    @Mutation(() => Project)
+    @UseMiddleware(authMiddelware, errorHandler)
+    async addMemberToProject(
+        @Ctx() { res }: Context,
+        @Arg("input") input: AddMemberToProjectInput,
+    ): Promise<Project> {
+        console.log("addMemberToProject resolver");
+        const { username, projectName, role } = input
 
+        try {
+            const project = await ProjectsModel.findOne({projectName})
+            if (!project) {
+                throw throwResolverError(404, "project not found")
+            }
+
+            const user = await UserModel.findOne({username});
+            if (!user) {
+                throw throwResolverError(404, "user not found")
+            }
+
+            const existingMember = await MemberModel.findOne({
+                _userId: user._id,
+                _projectId: project._id,
+            })
+
+            if (existingMember) {
+                throw throwGraphqlError(
+                    `User is already a member of this project`,
+                    400,
+                    languageError(
+                        `User is already a member of this project`,
+                        'المستخدم عضو في هذا المشروع'
+                    )
+                )
+            }
+
+            const newMember = new MemberModel({
+                _userId: user._id,
+                _projectId: project._id,
+                role: role,
+            });
+            await newMember.save();
+            // const updatedProject = await ProjectsModel.findById(projectObjectId); // Re-fetch
+            // if (!updatedProject) {
+            //     throw throwResolverError(500, "Failed to retrieve updated project");
+            // }
+            
+            return {
+                _id: project._id,
+                projectName: project.projectName,
+                description: project.description,
+                progress: project.progress,
+                imageUrl: project.imageUrl,
+                createdAt: new Date(project.createdAt),
+                updatedAt: new Date(project.updatedAt),
+            };
+
+        } catch (error: any) {
+            console.log("Error in addMemberToProject resolver:", error);
+            if (error.code === 11000 && error.message?.includes("index: Members.$_userId_1__projectId_1_")) {
+                throw throwGraphqlError("User is already a member of this project.", 400, languageError("User is already a member of this project.", "المستخدم عضو بالفعل في هذا المشروع."));
+            }
+            throw error; // Re-throw for other errors to be handled by middleware
+        }
+    }
     // seed permissions in db
     @Mutation(()=>String)
     async _test(
