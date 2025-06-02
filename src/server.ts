@@ -8,7 +8,7 @@ import { printSchema } from 'graphql';
 import mongoose from "mongoose";
 import cookieParser from 'cookie-parser';
 import { UserResolvers } from './Users/resolvers/user.resolver';
-import { ProjectsResolvers } from './Projects/resolvers/projects.resolver';
+import { ProjectsResolvers } from './Projects/resolvers/admin/projects.resolver';
 import { errorValidationHandler } from "./helper/validationError";
 import { createYoga,createPubSub } from 'graphql-yoga';
 
@@ -23,7 +23,6 @@ async function bootstrap() {
     resolvers: [UserResolvers,ProjectsResolvers],
     validate: true,
     emitSchemaFile: true,
-    globalMiddlewares: [errorValidationHandler],
   });
 
 
@@ -34,6 +33,17 @@ async function bootstrap() {
   var whitelist = ['http://localhost:5001','http://localhost:3000', 'chrome-extension://flnheeellpciglgpaodhkhmapeljopja']
   var corsOptions = {
       credentials: true,
+      // origin: function(origin, callback) {
+      //   // i can not access from http://localhost:5001
+        
+      //     console.log("origin",origin)
+      //   if (!origin) return callback(null, true);
+      //   if (whitelist.indexOf(origin) !== -1) {
+      //     callback(null, true)
+      //   } else {
+      //     callback(new Error('Not allowed by CORS'))
+      //   }
+      // }
       origin: function(origin, callback) {
         // i can not access from http://localhost:5001
         

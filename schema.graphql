@@ -40,6 +40,8 @@ type Project {
 
 type Query {
   auth: User!
+  getAllProjects: [Project!]!
+  getProjectById(_id: String!): Project
 }
 
 input RegisterInput {

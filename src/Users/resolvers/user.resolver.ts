@@ -697,7 +697,7 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// @UseMiddleware(errorValidationHandler)
+@UseMiddleware(errorValidationHandler)
 @Resolver()
 export class UserResolvers {
     // @Query(()=> String)
@@ -727,7 +727,6 @@ export class UserResolvers {
     async login(
         @Ctx() {req, res}: Context,
         @Arg("input") input: LoginInput,
-
       ):Promise<User | null> {
         // await wait(5000)
         const {username, password, email} = input

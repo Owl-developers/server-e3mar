@@ -40,6 +40,7 @@ type Project {
 
 type Query {
   auth: User!
+  getProjects: [Project!]!
 }
 
 input RegisterInput {
