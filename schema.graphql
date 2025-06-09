@@ -3,7 +3,7 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-input AddMemberToProjectInput {
+input AddManagerToProjectInput {
   projectName: String!
   role: String!
   username: String!
@@ -28,7 +28,7 @@ input LoginInput {
 
 type Mutation {
   _test: String!
-  addMemberToProject(input: AddMemberToProjectInput!): Project!
+  addManagerToProject(input: AddManagerToProjectInput!): Project
   createProject(input: CreateProjectArgs!): Project!
   login(input: LoginInput!): User
   register(input: RegisterInput!): User!
@@ -57,10 +57,6 @@ input RegisterInput {
   password: String!
   phone: String!
   username: String!
-}
-
-type Subscription {
-  test: String!
 }
 
 type User {

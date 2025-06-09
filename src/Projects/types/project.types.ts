@@ -22,6 +22,14 @@ class Project {
 }
 
 @ObjectType()
+class Sub {
+    @Field(()=> String)
+    message: string
+    @Field(()=> Project)
+    data: Project
+}
+
+@ObjectType()
 class UserProjects {
     @Field(()=> ID)
     _id!: mongoose.Types.ObjectId
@@ -52,7 +60,7 @@ class CreateProjectArgs {
 }
 
 @InputType()
-class AddMemberToProjectInput {
+class AddManagerToProjectInput {
     @Field(() => String)
     username: string;
     
@@ -61,13 +69,14 @@ class AddMemberToProjectInput {
     projectName: string;
 
     @Field(() => String)
-    @IsEnum(['manager', 'engineer', 'worker', 'owner'], { message: "Invalid role specified" })
-    role: 'manager' | 'engineer' | 'worker' | 'owner';
+    @IsEnum(['manager'], { message: "Invalid specified" })
+    role: string;
 }
 
 export {
     Project,
     UserProjects,
     CreateProjectArgs,
-    AddMemberToProjectInput,
+    AddManagerToProjectInput,
+    Sub
 }

@@ -42,7 +42,9 @@ type permission =
 "delete task" |
 
 "assign user" |
-"unassign user"
+"unassign user" |
+"assign manager" |
+"unassign manager"
 
 
 

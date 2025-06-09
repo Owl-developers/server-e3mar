@@ -1,113 +1,112 @@
-import "reflect-metadata"
-import express, {json, Request, Response } from 'express';
-import cors from "cors"
-import jwt from "jsonwebtoken"
+import "reflect-metadata";
+import express, { json, Request, Response } from 'express';
+import cors from "cors";
 import path from 'path';
 import { buildSchema } from 'type-graphql';
-import { printSchema } from 'graphql';
 import mongoose from "mongoose";
 import cookieParser from 'cookie-parser';
+import { createServer } from 'http';
+import { createYoga, createPubSub } from 'graphql-yoga';
+import { GraphQLError } from 'graphql';
 import { UserResolvers } from './Users/resolvers/user.resolver';
 import { ProjectsResolvers } from './Projects/resolvers/admin/projects.resolver';
-import { errorValidationHandler } from "./helper/validationError";
-import { createYoga,createPubSub } from 'graphql-yoga';
+import { languageError, throwGraphqlError, verifyToken } from "./helper";
 
 interface Context {
-  req: Request
-  res: Response
+  req: Request;
+  res: Response;
 }
 
+export const pubSub = createPubSub();
+
 async function bootstrap() {
-  const pubSub = createPubSub();
   const schema = await buildSchema({
-    resolvers: [UserResolvers,ProjectsResolvers],
+    resolvers: [UserResolvers, ProjectsResolvers],
     validate: true,
     emitSchemaFile: true,
-    // pubSub
-    // globalMiddlewares: [errorValidationHandler],
+    pubSub
   });
-
 
   const app: express.Application = express();
   const port: number = 5001;
   
-  const {connect} = mongoose
-  var whitelist = ['http://localhost:5001','http://localhost:3000', 'chrome-extension://flnheeellpciglgpaodhkhmapeljopja']
-  var corsOptions = {
-      credentials: true,
-      // origin: function(origin, callback) {
-      //   // i can not access from http://localhost:5001
-        
-      //     console.log("origin",origin)
-      //   if (!origin) return callback(null, true);
-      //   if (whitelist.indexOf(origin) !== -1) {
-      //     callback(null, true)
-      //   } else {
-      //     callback(new Error('Not allowed by CORS'))
-      //   }
-      // }
-      origin: function(origin, callback) {
-        // i can not access from http://localhost:5001
-        
-          console.log("origin",origin)
-        if (!origin) return callback(null, true);
-        if (whitelist.indexOf(origin) !== -1) {
-          callback(null, true)
-        } else {
-          callback(new Error('Not allowed by CORS'))
-        }
+  // CORS Configuration
+  const whitelist = [
+    'http://localhost:5001',
+    'http://localhost:3000', 
+    'chrome-extension://flnheeellpciglgpaodhkhmapeljopja'
+  ];
+  
+  app.use(cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
       }
-  }
-  app.use(cors(corsOptions))
-  app.use(json())
-  app.use(cookieParser())
+    }
+  }));
   
-  const connectDB = async () => {
-    await connect('mongodb://localhost:27017/e3mar')
-      .then(() => console.log('Connected Successfully'))
-      .catch((err) =>{
-          console.log("err mongoose connect", err)
-          console.error('Not Connected')
-      });
-  }
-  
-  connectDB()
+  app.use(json());
+  app.use(cookieParser());
 
+  // MongoDB Connection
+  const connectDB = async () => {
+    await mongoose.connect('mongodb://localhost:27017/e3mar')
+      .then(() => console.log('Connected Successfully'))
+      .catch((err) => {
+        console.error('Connection error:', err);
+      });
+  };
+  
+  await connectDB();
+
+  // Create Yoga instance
   const yoga = createYoga({
     schema,
-    context: {
+     context:({request}) => {
       pubSub
     },
     graphiql: true
-  })
+  });
 
-  // app.use('/graphql', graphqlHTTP((req, res) => {
-  //   return {
-  //     schema ,
-  //     context:{req, res},
-  //     graphiql: {
+  // Create HTTP server
+  const httpServer = createServer(app);
+  
 
-  //     },
+  // Apply Yoga middleware
+  app.use('/graphql', yoga);
 
-  //      // Enable GraphiQL for in-browser testing
-  //     // customExecuteFn: errorValidationHandler
-  //     // customFormatErrorFn:errorValidationHandler
-  //   }
+  // Create WebSocket server
+  // const wsServer = new WebSocketServer({
+  //   server: httpServer,
+  //   path: '/graphql',
 
-  // }));
-  app.use('/graphql', yoga)
-  // GraphiQL endpoint
+  // });
 
 
-  app.get('/', async (req: Request, res: Response) => {
 
+// wsServer.on("connection", (s,r)=> {
+//   console.log("connected", r.headers.cookie)
+//   if(!r.headers.cookie) {
+//     console.log('no headers')
+//     wsServer.close()
+//   }
+//   s.on("message", async (ss)=> {
+//     console.log("message", ss)
+//   })
+// })
+  // Basic route
+  app.get('/', (req: Request, res: Response) => {
     res.send('Hello, Binyan!');
   });
 
-  app.listen(port, () => {
+  // Start server
+  httpServer.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
     console.log('GraphiQL at http://localhost:5001/graphql');
   });
-
 }
+
 bootstrap()

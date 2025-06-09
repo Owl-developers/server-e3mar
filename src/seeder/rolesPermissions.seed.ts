@@ -15,4 +15,5 @@ export const seedRolesPermissions = async () => {
             });
         }
     }
+    console.log('seeding sucessfuly')
 };

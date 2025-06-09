@@ -28,7 +28,9 @@ const permissions= {
     DeleteTask: "delete task",
     // assign
     AssignUser: "assign user",
+    AssignManager: "assign manager",
     UnassignUser: "unassign user",
+    UnassignManager: "unassign manager",
 
 }
 
@@ -44,8 +46,8 @@ const rolesPermissions = {
         // tasks
         "view all tasks",
         // assign
-        "assign user",
-        "unassign user"
+        "assign manager",
+        "unassign manager"
     ],
     manager: [
         // project

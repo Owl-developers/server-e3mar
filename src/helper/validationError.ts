@@ -7,9 +7,10 @@ import { GraphQLError } from "graphql"
 export const errorValidationHandler: MiddlewareFn<Context> = async ({info}, next)=> {
     
     try {
+        console.log('errorValidationHandler middleware')
         const {fieldName,path} = info
         await next()
-        console.log("after1", fieldName, path)
+        console.log("after1 errorValidationHandler middleware", fieldName, path)
     } catch (err) {
         console.log("errorValidationHandler: ts", err)
 
@@ -44,6 +45,7 @@ class Validation {
             progress: {en: "progress", ar: "التقدم"},
             imageUrl: {en: "imageUrl", ar: "عنوان الصورة"},
             projectManager: {en: "project manager", ar: "اسم مدير المشروع"},
+            role: {en: "role", ar: "الدور"},
         }
         var property = this.property
         var constraint = this.constraint
@@ -80,6 +82,13 @@ class Validation {
                 // get the min number from the constraint
                 en: `${path[property].en} is less than ${this.err[0].constraints.min}`,
                 ar: `${path[property].ar} اقل من ${this.err[0].constraints.min}`,
+            }
+        }
+        if(constraint == "isEnum") {
+            return {
+                // get the min number from the constraint
+                en: `${path[property].en} is not valid value`,
+                ar: `${path[property].ar} ليس قيمة صحيحة`,
             }
         }
         // console.log("constraint", this.constraint)

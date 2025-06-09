@@ -15,6 +15,7 @@ import { generateToken, throwResolverError, verifyToken } from "../../helper"
 import { authMiddelware } from "../../helper/auth"
 import bcrypt from "bcryptjs"
 import { errorValidationHandler } from "../../helper/validationError"
+import { pubSub } from "../../server"
 
 
 const users = [
@@ -700,82 +701,78 @@ function wait(ms) {
 @UseMiddleware(errorValidationHandler)
 @Resolver()
 export class UserResolvers {
-    // @Query(()=> String)
-    // test():string {
-    //   return 'a'
-    // }
-    @Query(()=> User)
-    @UseMiddleware(authMiddelware, errorHandler)
-    async auth(@Ctx() {req, res}: Context): Promise<User | null> {
-      console.log("auth resolvers")
-      const token = res.locals.token
-      console.log("token", token)
-      if(!token) {
-        throw throwResolverError(401, "unauthenticated")
-      }
-      const user = await UserModel.findById(token._id)
+  // @Query(()=> String)
+  // test():string {
+  //   return 'a'
+  // }
+  @Query(()=> User)
+  @UseMiddleware(authMiddelware, errorHandler)
+  async auth(@Ctx() {req, res}: Context): Promise<User | null> {
+    console.log("auth resolvers")
+    const token = res.locals.token
+    console.log("token", token)
+    if(!token) {
+      throw throwResolverError(401, "unauthenticated")
+    }
+    const user = await UserModel.findById(token._id)
+    if(!user) {
+      throw throwResolverError(401, "unauthenticated")
+    }
+    return user
+
+  }
+
+  @Mutation(() => User, {nullable: true})
+  @UseMiddleware(errorHandler)
+  async login(
+      @Ctx() {req, res}: Context,
+      @Arg("input") input: LoginInput,
+    ):Promise<User | null> {
+      // await wait(5000)
+      const {username, password, email} = input
+      console.log("login user resolvers")
+      const user = await UserModel.findOne({username, email})
+      
       if(!user) {
-        throw throwResolverError(401, "unauthenticated")
+          throw throwResolverError(404, 'user not found')
       }
-
+      const correctPassword = await bcrypt.compare(password, user.password)
+      console.log(correctPassword)
+      if(!correctPassword) {
+          throw throwResolverError(404, 'user not found')
+      }
+      console.log(user)
+      console.log()
+      console.log(req.cookies)
+      const token = generateToken(user)
+      res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
       return user
+  }
+  @Mutation(()=> User)
+  @UseMiddleware(errorHandler)
+  async register(@Ctx() {req, res}: Context ,@Arg("input") input: RegisterInput):Promise <User | string> {
+      const {username, password, email, phone} = input
+      const hashedPassword = await bcrypt.hash(password, 10)
+      const user = await UserModel.create({
+          username,
+          password: hashedPassword,
+          email,
+          phone,
+      })
+      console.log(user)
+      const token = generateToken(user)
+      res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
+      return user
+  }
+  @Mutation(()=> User)
+  async test():Promise<User | null> {
+      console.log("test resolvers")
 
-    }
-
-    @Mutation(() => User, {nullable: true})
-    @UseMiddleware(errorHandler)
-    async login(
-        @Ctx() {req, res}: Context,
-        @Arg("input") input: LoginInput,
-        // @PubSub() pubsub: any, // This line is causing the error
-      ):Promise<User | null> {
-        // await wait(5000)
-        const {username, password, email} = input
-        console.log("login user resolvers")
-        const user = await UserModel.findOne({username, email})
-        
-        if(!user) {
-            throw throwResolverError(404, 'user not found')
-        }
-        const correctPassword = await bcrypt.compare(password, user.password)
-        console.log(correctPassword)
-        if(!correctPassword) {
-            throw throwResolverError(404, 'user not found')
-        }
-        console.log(user)
-        console.log()
-        console.log(req.cookies)
-        const token = generateToken(user)
-        res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
-        // Subscribe to PROJECT_CREATED events
-        // pubsub.publish("testPUB","test")
-        return user
-    }
-    @Mutation(()=> User)
-    @UseMiddleware(errorHandler)
-    async register(@Ctx() {req, res}: Context ,@Arg("input") input: RegisterInput):Promise <User | string> {
-        const {username, password, email, phone} = input
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const user = await UserModel.create({
-            username,
-            password: hashedPassword,
-            email,
-            phone,
-        })
-        console.log(user)
-        const token = generateToken(user)
-        res.cookie("token", token, { path: "/", secure: true, httpOnly: true })
-        return user
-    }
-    @Mutation(()=> User)
-    async test():Promise<User | null> {
-        console.log("test resolvers")
-
-        const user = await UserModel.deleteMany({email: {$regex: "@example.com"}})
-        console.log(user)
-        
-        return null
-    }
+      const user = await UserModel.deleteMany({email: {$regex: "@example.com"}})
+      console.log(user)
+      
+      return null
+  }
 
 
 }
