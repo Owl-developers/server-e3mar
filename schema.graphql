@@ -59,6 +59,16 @@ input RegisterInput {
   username: String!
 }
 
+type Sub {
+  data: Project!
+  message: String!
+}
+
+type Subscription {
+  _addManagerToProject: Sub
+  addManagerToProject: Sub
+}
+
 type User {
   _id: ID!
   email: String

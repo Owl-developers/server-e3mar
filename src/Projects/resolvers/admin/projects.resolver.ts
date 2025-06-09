@@ -155,7 +155,7 @@ class ProjectsResolvers {
             role: role,
         });
         await newMember.save();
-            
+        pubSub.publish(String(user._id),{message:`you joined to ${projectName}`, data: project})
         return {
             _id: project._id,
             projectName: project.projectName,
@@ -166,6 +166,25 @@ class ProjectsResolvers {
             updatedAt: new Date(project.updatedAt),
         };
 
+    }
+
+    @Subscription(()=> Sub,{
+        nullable: true,
+        topics: ({args, context})=> {
+            const {req, res} = context as Context
+            const token = req.cookies.token
+            console.log("context",res.locals.token._id)
+            console.log("topics",token)
+
+            return res.locals.token._id
+        },
+    })
+    _addManagerToProject(
+        @Root()root,
+    ): any {
+        console.log('_addMemberToProject sub')
+        console.log({root})
+        return root
     }
 
     // seed permissions in db

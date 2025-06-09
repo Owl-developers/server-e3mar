@@ -10,6 +10,7 @@ import { createYoga, createPubSub } from 'graphql-yoga';
 import { GraphQLError } from 'graphql';
 import { UserResolvers } from './Users/resolvers/user.resolver';
 import { ProjectsResolvers } from './Projects/resolvers/admin/projects.resolver';
+import { ProjectsUserResolvers } from './Projects/resolvers/user/projectsUser.resolver';
 import { languageError, throwGraphqlError, verifyToken } from "./helper";
 
 interface Context {
@@ -21,9 +22,13 @@ export const pubSub = createPubSub();
 
 async function bootstrap() {
   const schema = await buildSchema({
-    resolvers: [UserResolvers, ProjectsResolvers],
-    validate: true,
+    resolvers: [
+      UserResolvers, 
+      ProjectsResolvers,
+      ProjectsUserResolvers
+    ],
     emitSchemaFile: true,
+    validate: true,
     pubSub
   });
 
@@ -68,6 +73,42 @@ async function bootstrap() {
      context:({request}) => {
       pubSub
     },
+    plugins: [{
+
+      onSubscribe: async (ctx, msg)=> {
+        const cookie = ctx.context.req.cookies
+        console.log('===== on sub ======')
+        console.log('===== ctx', ctx.context.req.cookies.token )
+        console.log('===== msg', msg)
+        try {
+          const token = verifyToken(cookie.token)
+          if(!token) {
+            //in production
+            // throw throwGraphqlError("unauthenticated",401, languageError('unauthenticated', "غير مسجل"))
+            //in development
+            throw throwGraphqlError("unauthenticated",401, languageError('unauthenticated onSub', " غير مسجل عند الاشتراك"))
+  
+          }
+          ctx.context.res.locals.token = token
+        } catch (err) {
+          console.log("on sub error" ,err)
+          ctx.context.res.clearCookie('token')
+          if(err.name == "TokenExpiredError") {
+            ctx.context.res.clearCookie('token')
+            throw throwGraphqlError("unauthenticated",401, languageError('expired', "انتهت صلاحية الجلسة"))
+          }
+          if(err.name == "JsonWebTokenError") {
+            ctx.context.res.clearCookie('token')
+            console.log("here")            
+            throw throwGraphqlError("unauthenticated",401, languageError('unauthenticated', "غير مسجل"))
+          }
+          if(err.code == 401) {
+            ctx.context.res.clearCookie('token')
+            throw throwGraphqlError("unauthenticated",401, languageError('unauthenticated','غير مسجل'))
+          }
+        }
+      }
+    }],
     graphiql: true
   });
 
